@@ -196,8 +196,8 @@ module Grammar (Tree: Tree) (Nonterm: Nonterminal) (Attr: Attribute) =
              fun rules (terminals, nonterminals, maxdegree) ->
                let table = 
                    {
-                     normals = init terminals (fun _ -> create (maxdegree+1) []);
-                     chains  = create nonterminals [];
+                     normals = init terminals (fun _ -> make (maxdegree+1) []);
+                     chains  = make nonterminals [];
                    } 
                in
                List.iter 
@@ -207,15 +207,15 @@ module Grammar (Tree: Tree) (Nonterm: Nonterminal) (Attr: Attribute) =
                      | Normal (d, t, sons, _, _, _), lab -> 
                         let t, s = Tree.term t, List.length sons in
 
-                        if t < 0 or t >= terminals    then (raise (Terminal (t, lab)));
+                        if t < 0 || t >= terminals    then (raise (Terminal (t, lab)));
                         if s > maxdegree              then (raise (Degree   (s, lab)));
-                        if d < 0 or d >= nonterminals then (raise (Derived  (d, lab)));
+                        if d < 0 || d >= nonterminals then (raise (Derived  (d, lab)));
 
                         table.normals.(t).(s) <- rule :: table.normals.(t).(s)
           
                      | Chain (d, n, _, _, _), lab ->  
-                        if n < 0 or n >= nonterminals then (raise (Nonterm (n, lab)));
-                        if d < 0 or d >= nonterminals then (raise (Derived (d, lab)));
+                        if n < 0 || n >= nonterminals then (raise (Nonterm (n, lab)));
+                        if d < 0 || d >= nonterminals then (raise (Derived (d, lab)));
 
                         table.chains.(n) <- rule :: table.chains.(n)
                  )
@@ -295,7 +295,7 @@ module Grammar (Tree: Tree) (Nonterm: Nonterminal) (Attr: Attribute) =
         type 'a t      = 'a labels * WTree.t
         and  'a elem   = {attr: Attr.t; cost: int; rule: 'a rule}
         and  'a label  = 'a elem option array     
-	and  'a labels = 'a label array
+	      and  'a labels = 'a label array
         and  'a rc     = Ok of 'a t | Fail of string
 
         open Array 
