@@ -1,13 +1,16 @@
+OCAMLC=ocamlc
+OCAMLWARNINGS=-w p
+
 all: example
 
 example: peterburg.cmo example.ml
-	ocamlc -w p peterburg.cmo example.ml -o $@
+	$(OCAMLC) $(OCAMLWARNINGS) $^ -o $@
 
-peterburg.cmo: peterburg.cmi peterburg.ml
-	ocamlc -w p -c peterburg.ml
+peterburg.cmo: peterburg.ml peterburg.cmi
+	$(OCAMLC) $(OCAMLWARNINGS) -c $<
 
 peterburg.cmi: peterburg.mli
-	ocamlc -c $<
+	$(OCAMLC) -c $<
 
 clean: 
 	rm -f *.cmi *.cmo example
