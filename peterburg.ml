@@ -241,7 +241,6 @@ module Grammar (Tree : Tree) (Nonterm : Nonterminal) (Attr : Attribute) = struct
   module WNonterm = WrappedNonterm (Nonterm)
 
   module Labeler = struct
-    exception Break
     exception Nomatch of Tree.t
 
     type 'a t = 'a labels * WTree.t
@@ -293,14 +292,14 @@ module Grammar (Tree : Tree) (Nonterm : Nonterminal) (Attr : Attribute) = struct
                   List.fold_left2
                     (fun (al, cl) node nonterm ->
                       match labels.(WTree.id node).(nonterm) with
-                      | None -> raise Break
+                      | None -> raise Exit
                       | Some { attr = a; cost = c; rule = _ } ->
                           (a :: al, c :: cl))
                     ([], []) nodes nonterms
                 in
                 Some (List.rev attrs, List.rev costs)
               with
-              | Break -> None
+              | Exit -> None
               | x -> raise x
             in
 
@@ -339,11 +338,11 @@ module Grammar (Tree : Tree) (Nonterm : Nonterminal) (Attr : Attribute) = struct
                 rules;
               try
                 iter
-                  (fun e -> match e with Some _ -> raise Break | _ -> ())
+                  (fun e -> match e with Some _ -> raise Exit | _ -> ())
                   labels.(WTree.id node);
                 raise (Nomatch (WTree.orig node))
               with
-              | Break -> ()
+              | Exit -> ()
               | x -> raise x
             in
 
